@@ -1,19 +1,27 @@
-# MODULE NAME
+# DGI JAAS Implementations
 
 ## Introduction
 
-DESCRIPTION
+Workaround implementations.
 
-## Requirements
+The stock `org.fcrepo.server.security.jaas.auth.module.XmlUsersFileModule` class uses the Xerces XML parser between multiple thread; however, [this parser is _not_ thread safe](https://issues.apache.org/jira/browse/XERCESJ-211?focusedCommentId=33322&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-33322). This results in a race condition that can prevent users specific in the XML file from being able to login.
 
-This module requires the following modules/libraries:
+## Building
 
-* [Islandora](https://github.com/islandora/islandora)
-* [Tuque](https://github.com/islandora/tuque)
+```
+FEDORA_VERSION="3.6.2"
+git clone git@github.com:discoverygarden/fcrepo3-security-jaas.git
+cd fcrepo3-security-jaas
+mvn package -Dfedora.version=$FEDORA_VERSION
+```
+
+Builds against 3.6.2 and generates a JAR in `fcrepo3-security-jaas/target`.
 
 ## Installation
 
-Install as usual, see [this](https://drupal.org/documentation/install/modules-themes/modules-7) for further information.
+1. Drop the built JAR into your `$CATALINA_HOME/webapps/fedora/WEB-INF/lib`; and,
+2. Update references in your `$FEDORA_HOME/server/config/jaas.conf` from `org.fcrepo.server.security.jaas.auth.module.XmlUsersFileModule` to `ca.discoverygarden.fcrepo3.security.jaas.XmlUsersFileModule`.
+3. If Fedora is running, restart it so it picks up the new configuration.
 
 ## Troubleshooting/Issues
 
@@ -24,13 +32,6 @@ Having problems or solved a problem? Contact [discoverygarden](http://support.di
 Current maintainers:
 
 * [discoverygarden](http://www.discoverygarden.ca)
-
-## Development
-
-If you would like to contribute to this module, please check out our helpful
-[Documentation for Developers](https://github.com/Islandora/islandora/wiki#wiki-documentation-for-developers)
-info, [Developers](http://islandora.ca/developers) section on Islandora.ca and
-contact [discoverygarden](http://support.discoverygarden.ca).
 
 ## License
 
