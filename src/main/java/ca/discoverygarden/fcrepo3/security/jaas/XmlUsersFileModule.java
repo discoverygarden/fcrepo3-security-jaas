@@ -287,7 +287,11 @@ implements LoginModule {
                 }
             }
             final FullUserInfo user = new FullUserInfo(name, password, attributes);
-            users.putIfAbsent(user, user);
+            if (!users.containsKey(user)) {
+                // Upstream class would use the _first_ matching user it finds,
+                // so let's make sure not to replace users already there.
+                users.put(user, user);
+            }
         }
 
         return Collections.unmodifiableMap(users);
