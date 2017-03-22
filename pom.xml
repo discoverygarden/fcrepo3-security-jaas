@@ -4,7 +4,7 @@
     <groupId>ca.discoverygarden</groupId>
     <artifactId>fcrepo3-security-jaas</artifactId>
     <version>${fedora.version}</version>
-    <name>JAAS implementations</name>
+    <name>DGI JAAS implementations</name>
     <properties>
         <skipTests>true</skipTests>
         <fedora.version>3.6.2</fedora.version>
@@ -29,4 +29,5 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+    <url>https://github.com/discoverygarden/fcrepo3-security-jaas</url>
 </project>

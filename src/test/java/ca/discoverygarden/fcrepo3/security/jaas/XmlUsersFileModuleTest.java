@@ -13,6 +13,9 @@ import junit.framework.TestCase;
 public class XmlUsersFileModuleTest extends TestCase {
     protected XmlUsersFileModule module;
 
+    @SuppressWarnings({
+        "unchecked", "rawtypes"
+    })
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -23,7 +26,7 @@ public class XmlUsersFileModuleTest extends TestCase {
     }
 
     public void testParse() throws LoginException {
-        assertTrue(module.authenticate("fedoraAdmin", "islandora"));
+        assertTrue(module.authenticate("fedoraAdmin", "test_password"));
 
         final Map<String, Set<String>> attributes = module.attributes;
 
@@ -45,7 +48,7 @@ public class XmlUsersFileModuleTest extends TestCase {
     }
 
     public void testParseTwo() throws LoginException {
-        assertTrue(module.authenticate("fedoraIntCallUser", "changeme"));
+        assertTrue(module.authenticate("fedoraIntCallUser", "test_changeme"));
 
         final Map<String, Set<String>> attributes = module.attributes;
 
