@@ -44,6 +44,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+/**
+ * Adjusted copypasta of
+ * org.fcrepo.server.security.jaas.auth.module.XmlUsersFileModule.
+ *
+ * Primarily, to avoid thread-unsafe behaviour with DOM parsing, and to adjust
+ * the visibility of "private" member to "protected", to facilitate overriding
+ * in subclasses.
+ *
+ * @see org.fcrepo.server.security.jaas.auth.module.XmlUsersFileModule
+ */
 public class XmlUsersFileModule
 implements LoginModule {
     protected static final Logger logger =
