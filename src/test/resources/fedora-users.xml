@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<users>
+    <user name="fedoraAdmin" password="test_password">
+        <attribute name="fedoraRole">
+            <value>administrator</value>
+        </attribute>
+        <attribute name="custom_one">
+            <value>custom one</value>
+            <value>one custom</value>
+        </attribute>
+        <attribute name="custom_two">
+            <value>bravo</value>
+        </attribute>
+    </user>
+    <user name="fedoraIntCallUser" password="test_changeme">
+        <attribute name="fedoraRole">
+            <value>fedoraInternalCall-1</value>
+            <value>fedoraInternalCall-2</value>
+        </attribute>
+    </user>
+</users>
