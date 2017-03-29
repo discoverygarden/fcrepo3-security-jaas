@@ -96,7 +96,7 @@ implements Filter {
 
     protected static final String JAAS_CONFIG_DEFAULT = "fedora-auth";
 
-    protected static final String ROLE_KEY = "role";
+    public static final String ROLE_KEY = "role";
 
     protected static final String FEDORA_ROLE_KEY = "fedoraRole";
 
@@ -141,6 +141,7 @@ implements Filter {
         filterConfigBean.addInitParameter("roleAttributeNames", names);
     }
 
+    @Override
     public void init(FilterConfig config) throws ServletException {
         this.filterConfig = config;
         if (this.filterConfig == null) {
@@ -241,6 +242,7 @@ implements Filter {
      * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
      * javax.servlet.ServletResponse, javax.servlet.FilterChain)
      */
+    @Override
     public void doFilter(ServletRequest request,
             ServletResponse response,
             FilterChain chain) throws IOException,
@@ -336,6 +338,7 @@ implements Filter {
         }
     }
 
+    @Override
     public void destroy() {
         logger.info("destroying servlet filter: " + this.getClass().getName());
         filterConfig = null;

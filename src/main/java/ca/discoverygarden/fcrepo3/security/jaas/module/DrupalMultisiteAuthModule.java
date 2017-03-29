@@ -24,21 +24,56 @@ import org.dom4j.Element;
 
 import ca.discoverygarden.fcrepo3.security.jaas.filter.KeyChoiceCallback;
 import ca.discoverygarden.fcrepo3.security.jaas.filter.MissingCredsException;
+import ca.discoverygarden.fcrepo3.security.jaas.filter.UpstreamAuthFilterJAAS;
 import ca.upei.roblib.fedora.servletfilter.DrupalAuthModule;
 
 public class DrupalMultisiteAuthModule extends DrupalAuthModule {
-    public static final String SUBJECT_ATTRIBUTE_NAME = "islandora-agent";
+    /**
+     * The name of the attribute we are to make available (in XACML).
+     */
+    public static final String SUBJECT_AGENT_ATTRIBUTE_NAME = "islandora-agent";
+
+    /**
+     * The name of the column containing the userid.
+     */
+    public static final String SQL_COL_ID = "userid";
+    /**
+     * The name of the column containing the roles.
+     */
+    public static final String SQL_COL_ROLE = "role";
+
+    /**
+     * The key in the parsed map containing the sql query.
+     */
+    public static final String XML_SQL_ELEMENT_NAME = "sql";
+
+    /**
+     * The string, "anonymous".
+     */
+    public static final String ANONYMOUS = "anonymous";
+
     protected Map<String, Map<String, String>> config;
 
     public DrupalMultisiteAuthModule() throws IOException, DocumentException {
         config = new HashMap<String, Map<String, String>>();
         parseConfig();
     }
+    
+    /**
+     * Parse connection entries from the default document.
+     * @throws DocumentException
+     * @throws IOException
+     */
 
     protected void parseConfig() throws DocumentException, IOException {
         Document doc = getParsedConfig();
         parseConfig(doc);
     }
+    
+    /**
+     * Parse connection entries out of the given document.
+     * @param doc
+     */
 
     protected void parseConfig(Document doc) {
         config.clear();
@@ -48,6 +83,7 @@ public class DrupalMultisiteAuthModule extends DrupalAuthModule {
             config.put(el.attributeValue("key").trim(), parseConnectionElement(el));
         }
     }
+
 
     @Override
     public boolean login() throws LoginException {
@@ -96,16 +132,31 @@ public class DrupalMultisiteAuthModule extends DrupalAuthModule {
         return successLogin;
     }
 
+    /**
+     * Helper to set our agent attribute for XACML.
+     *
+     * @param agent
+     *            Our site-specific key.
+     */
+
     protected void setAgentsSet(String agent) {
         Set<String> agents = new HashSet<String>();
         agents.add(agent);
-        attributes.put(SUBJECT_ATTRIBUTE_NAME, agents);
+        attributes.put(SUBJECT_AGENT_ATTRIBUTE_NAME, agents);
     }
 
+
     /**
+     * Find the given user.
+     *
+     * @see DrupalAuthModule.findUser()
      *
      * @param userid
+     *            The user to authenticate.
      * @param password
+     *            The password with which to authenticate.
+     * @param agent
+     *            The site-specific key to identify where to search.
      */
     protected void findUser(String userid, String password, String agent) {
         if (logger.isDebugEnabled()) {
@@ -115,53 +166,50 @@ public class DrupalMultisiteAuthModule extends DrupalAuthModule {
 
         // If the user is anonymous don't check the database just give the
         // anonymous role.
-        if ("anonymous".equals(userid) && "anonymous".equals(password)) {
+        if (ANONYMOUS.equals(userid) && ANONYMOUS.equals(password)) {
             createAnonymousUser();
             return;
         }
 
+        Set<String> roles = new HashSet<String>();
+
         try {
             Map<String, String> parsed = config.get(agent);
 
-            // we may want to implement a connection pool or something here if
-            // performance gets to be
-            // an issue. on the plus side mysql connections are fairly
-            // lightweight compared to postgres
-            // and the database only gets hit once per user session so we may be
-            // ok.
+            // XXX: We may want to implement some form of connection pooling.
             Connection conn = connectToDB(parsed);
             if (conn != null) {
-                PreparedStatement pstmt = conn.prepareStatement(parsed.get("sql"));
+                PreparedStatement pstmt = conn.prepareStatement(parsed.get(XML_SQL_ELEMENT_NAME));
                 pstmt.setString(2, password);
                 pstmt.setString(1, userid);
                 ResultSet rs = pstmt.executeQuery();
                 boolean hasMoreRecords = rs.next();
-                if (hasMoreRecords && attributeValues == null) {
+                if (hasMoreRecords && roles.isEmpty()) {
                     username = userid;
-                    int numericId = rs.getInt("userid");
-                    attributeValues = new HashSet<String>();
-                    if (numericId == 0) {
-                        // Add the role anonymous in case user in drupal is not
-                        // associated with any Drupal roles.
-                        attributeValues.add(DrupalMultisiteAuthModule.ANONYMOUSROLE);
-                        // XXX: Maintain old "anonymous" role, in case it it is
-                        // actually being used.
-                        attributeValues.add("anonymous");
-                    }
-                    else if (numericId == 1) {
-                        attributeValues.add("administrator");
-                    }
-                    if (numericId > 0) {
-                        attributeValues.add("authenticated user");
+                    switch (rs.getInt(SQL_COL_ID)) {
+                        case 0:
+                            // XXX: Just here for completeness... Really, this
+                            // code should never be hit.
+                            logger.warn("Got login for user with ID 0.");
+                            roles.add(DrupalAuthModule.ANONYMOUSROLE);
+                            // XXX: Maintain old "anonymous" role, in case it is
+                            // actually being used.
+                            roles.add(ANONYMOUS);
+                            break;
+                        case 1:
+                            roles.add("administrator");
+                            // Fallthrough
+                        default:
+                            roles.add("authenticated user");
                     }
                     successLogin = true;
                 }
                 while (hasMoreRecords) {
-                    String role = rs.getString("role");
+                    String role = rs.getString(SQL_COL_ROLE);
                     if (role != null) {
                         logger.debug(
                                 String.format("%s, added role: %s", DrupalMultisiteAuthModule.class.getName(), role));
-                        attributeValues.add(role);
+                        roles.add(role);
                     }
                     hasMoreRecords = rs.next();
                 }
@@ -175,6 +223,6 @@ public class DrupalMultisiteAuthModule extends DrupalAuthModule {
             logger.error("Error retrieving user info " + ex.getMessage());
         }
 
-        attributes.put("role", attributeValues);
+        attributes.put(UpstreamAuthFilterJAAS.ROLE_KEY, roles);
     }
 }
