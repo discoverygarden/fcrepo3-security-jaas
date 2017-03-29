@@ -8,8 +8,16 @@ The stock `org.fcrepo.server.security.jaas.auth.module.XmlUsersFileModule` class
 
 ## Building
 
-```
+```bash
 FEDORA_VERSION="3.6.2"
+# We are dependent on the islandora_drupal_filter, so install into the local
+# Maven repo.
+git clone git@github.com:Islandora/islandora_drupal_filter.git
+cd islandora_drupal_filter
+mvn -Dfedora.version=$FEDORA_VERSION install
+cd ..
+
+# Now, let's get ourselves built.
 git clone git@github.com:discoverygarden/fcrepo3-security-jaas.git
 cd fcrepo3-security-jaas
 mvn package -Dfedora.version=$FEDORA_VERSION
