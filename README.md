@@ -33,7 +33,7 @@ Builds against 3.6.2 and generates a JAR in `fcrepo3-security-jaas/target`.
 
 After installing the JAR:
 
-1. Update references in your `$FEDORA_HOME/server/config/jaas.conf` from `org.fcrepo.server.security.jaas.auth.module.XmlUsersFileModule` to `ca.discoverygarden.fcrepo3.security.jaas.XmlUsersFileModule`.
+1. Update references in your `$FEDORA_HOME/server/config/jaas.conf` from `org.fcrepo.server.security.jaas.auth.module.XmlUsersFileModule` to `ca.discoverygarden.fcrepo3.security.jaas.module.XmlUsersFileModule`.
 2. If Fedora is running, restart it so it picks up the new configuration.
 
 ### Multisite Optimization

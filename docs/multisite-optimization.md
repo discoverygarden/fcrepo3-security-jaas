@@ -20,12 +20,12 @@ Assuming Fedora is installed with the path `fedora`, installation should just re
 
 ## JAAS implementation integration
 
-To make Fedora use our JAAS implementation, alter `AuthFilterJAAS` bean defined in `$FEDORA_HOME/server/config/security/web.xml` to use our class `ca.upei.roblib.fedora.servletfilter.jaas.AuthFilterJAAS` instead of `org.fcrepo.server.security.jaas.AuthFilterJAAS`.
+To make Fedora use our JAAS implementation, alter `AuthFilterJAAS` bean defined in `$FEDORA_HOME/server/config/security/web.xml` to use our class `ca.discoverygarden.fcrepo3.security.jaas.filter.AuthFilterJAAS` instead of `org.fcrepo.server.security.jaas.AuthFilterJAAS`.
 
 ```xml
 [...]
 <!-- The "class" attribute here is what has been changed -->
-<bean id="AuthFilterJAAS" class="ca.upei.roblib.fedora.servletfilter.jaas.AuthFilterJAAS"
+<bean id="AuthFilterJAAS" class="ca.discoverygarden.fcrepo3.security.jaas.filter.AuthFilterJAAS"
   [...]>
   <!-- Default; insert uncommented to change the header used.
   <property name="keyHeader" value="User-Agent"/>
@@ -35,14 +35,14 @@ To make Fedora use our JAAS implementation, alter `AuthFilterJAAS` bean defined 
 
 ## LoginModule
 
-The configuration of modules is done in `$FEDORA_HOME/server/config/jaas.conf` by default. In the `fedora-auth` section, we need to introduce our `ca.upei.roblib.fedora.servletfilter.DrupalMultisiteAuthModule`. Ideally, this should look something like:
+The configuration of modules is done in `$FEDORA_HOME/server/config/jaas.conf` by default. In the `fedora-auth` section, we need to introduce our `ca.discoverygarden.fcrepo3.security.jaas.module.DrupalMultisiteAuthModule`. Ideally, this should look something like:
 
 ```
 fedora-auth
 {
         org.fcrepo.server.security.jaas.auth.module.XmlUsersFileModule sufficient
         debug=true;
-        ca.upei.roblib.fedora.servletfilter.DrupalMultisiteAuthModule sufficient
+        ca.discoverygarden.fcrepo3.security.jaas.module.DrupalMultisiteAuthModule sufficient
         debug=true;
 };
 ```
@@ -59,7 +59,7 @@ fedora-auth
 {
         org.fcrepo.server.security.jaas.auth.module.XmlUsersFileModule sufficient
         debug=true;
-        ca.upei.roblib.fedora.servletfilter.DrupalMultisiteAuthModule sufficient
+        ca.discoverygarden.fcrepo3.security.jaas.module.DrupalMultisiteAuthModule sufficient
         debug=true;
         ca.upei.roblib.fedora.servletfilter.DrupalAuthModule sufficient
         debug=true;
