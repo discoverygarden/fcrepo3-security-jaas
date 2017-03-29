@@ -190,6 +190,7 @@
                 <directory>src/test/resources</directory>
                 <includes>
                     <include>filter-drupal-multisite.xml</include>
+                    <include>fedora-users.xml</include>
                 </includes>
             </testResource>
         </testResources>
