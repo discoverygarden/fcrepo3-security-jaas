@@ -8,7 +8,6 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
-import ca.discoverygarden.fcrepo3.security.jaas.module.XmlUsersFileModule;
 import junit.framework.TestCase;
 
 public class XmlUsersFileModuleTest extends TestCase {
