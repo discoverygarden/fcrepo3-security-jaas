@@ -6,23 +6,13 @@
     <version>${fedora.version}</version>
     <name>DGI JAAS implementations</name>
     <properties>
+        <skipTests>false</skipTests>
+        <skipSqlTests>true</skipSqlTests>
         <fedora.version>3.6.2</fedora.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.fcrepo</groupId>
-            <artifactId>fcrepo-security-jaas</artifactId>
-            <version>${fedora.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.transaction</groupId>
-                    <artifactId>jta</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>javax.transaction</groupId>
             <artifactId>jta</artifactId>
@@ -35,6 +25,174 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>ca.islandora</groupId>
+            <artifactId>fcrepo-drupalauthfilter</artifactId>
+            <version>${fedora.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fcrepo</groupId>
+            <artifactId>fcrepo-security-jaas</artifactId>
+            <version>${fedora.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.trippi</groupId>
+                    <artifactId>trippi-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.26</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-901.jdbc4</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+    <profiles>
+        <profile>
+            <id>test</id>
+            <activation>
+                <property>
+                    <name>skipSqlTests</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <properties>
+                <db.server>127.0.0.1</db.server>
+                <db.name>drupal</db.name>
+                <db.user>drupal</db.user>
+                <db.pass>drupal</db.pass>
+                <db.port>3306</db.port>
+                <db.class>com.mysql.jdbc.Driver</db.class>
+                <db.scheme>jdbc:mysql</db.scheme>
+                <db.group>mysql</db.group>
+                <db.artifact>mysql-connector-java</db.artifact>
+                <db.version>5.1.26</db.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>sql-maven-plugin</artifactId>
+                        <version>1.5</version>
+
+                        <dependencies>
+                            <!-- specify the dependent jdbc driver here -->
+                            <dependency>
+                                <groupId>${db.group}</groupId>
+                                <artifactId>${db.artifact}</artifactId>
+                                <version>${db.version}</version>
+                            </dependency>
+                        </dependencies>
+
+                        <!-- common configuration shared by all executions -->
+                        <configuration>
+                            <driver>${db.class}</driver>
+                            <url>${db.scheme}://${db.server}:${db.port}/${db.name}</url>
+                            <username>${db.user}</username>
+                            <password>${db.pass}</password>
+                            <settingsKey>sensibleKey</settingsKey>
+                            <!--all executions are ignored if -Dmaven.test.skip=true -->
+                            <skip>${skipSqlTests}</skip>
+                        </configuration>
+
+                        <executions>
+                            <execution>
+                                <id>drop-db-before-test-if-any</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- need another database to drop the
+                                        targeted one -->
+                                    <url>${db.scheme}://${db.server}:${db.port}</url>
+                                    <autocommit>true</autocommit>
+                                    <sqlCommand>DROP DATABASE
+                                        ${db.name};</sqlCommand>
+                                    <!-- ignore error when database is not
+                                        available -->
+                                    <onError>continue</onError>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>create-db</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <url>${db.scheme}://${db.server}:${db.port}</url>
+                                    <!-- no transaction -->
+                                    <autocommit>true</autocommit>
+                                    <sqlCommand>CREATE DATABASE
+                                        ${db.name};</sqlCommand>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>populate-db</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <autocommit>true</autocommit>
+                                    <srcFiles>
+                                        <srcFile>src/test/sql/basic-schema.sql</srcFile>
+                                    </srcFiles>
+                                </configuration>
+                            </execution>
+
+                            <!-- drop db after test -->
+                            <execution>
+                                <id>drop-db-after-test</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <url>${db.scheme}://${db.server}:${db.port}</url>
+                                    <autocommit>true</autocommit>
+                                    <sqlCommand>DROP DATABASE
+                                        ${db.name};</sqlCommand>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <build>
+        <testResources>
+            <testResource>
+                <filtering>true</filtering>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>filter-drupal-multisite.xml</include>
+                </includes>
+            </testResource>
+        </testResources>
+    </build>
     <url>https://github.com/discoverygarden/fcrepo3-security-jaas</url>
 </project>

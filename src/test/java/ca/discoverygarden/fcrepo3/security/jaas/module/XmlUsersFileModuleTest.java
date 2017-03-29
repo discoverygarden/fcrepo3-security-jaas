@@ -1,4 +1,4 @@
-package ca.discoverygarden.fcrepo3.security.jaas;
+package ca.discoverygarden.fcrepo3.security.jaas.module;
 
 import java.io.File;
 import java.util.HashMap;
@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
+import ca.discoverygarden.fcrepo3.security.jaas.module.XmlUsersFileModule;
 import junit.framework.TestCase;
 
 public class XmlUsersFileModuleTest extends TestCase {

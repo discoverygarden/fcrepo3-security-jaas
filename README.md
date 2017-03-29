@@ -19,9 +19,22 @@ Builds against 3.6.2 and generates a JAR in `fcrepo3-security-jaas/target`.
 
 ## Installation
 
-1. Drop the built JAR into your `$CATALINA_HOME/webapps/fedora/WEB-INF/lib`; and,
-2. Update references in your `$FEDORA_HOME/server/config/jaas.conf` from `org.fcrepo.server.security.jaas.auth.module.XmlUsersFileModule` to `ca.discoverygarden.fcrepo3.security.jaas.XmlUsersFileModule`.
-3. If Fedora is running, restart it so it picks up the new configuration.
+1. Drop the built JAR into your `$CATALINA_HOME/webapps/fedora/WEB-INF/lib`
+
+### `XMLUsersFileModule` thread-safety
+
+After installing the JAR:
+
+1. Update references in your `$FEDORA_HOME/server/config/jaas.conf` from `org.fcrepo.server.security.jaas.auth.module.XmlUsersFileModule` to `ca.discoverygarden.fcrepo3.security.jaas.XmlUsersFileModule`.
+2. If Fedora is running, restart it so it picks up the new configuration.
+
+### Multisite Optimization
+
+The original `DrupalAuthModule` implementation requires iterating through all configured connection when authenticating users, and for repositories connected to many sites, this iteration can be slow (and unavailable sites may even result in timeouts); therefore, it is desirable if it was possible to more directly select which against which to attempt authentication.
+
+The `DrupalMultisiteAuthModule` looks for `key` attributes on each connection element, which must match the `key` obtained from the HTTP request in our `ca.discoverygarden.fcrepo3.security.jaas.filter.AuthFilterJAAS` implementation (by default, the `User-Agent` header because it is easily modified for requests from Tuque; configurable to other headers using the `keyHeader` property in the Spring bean configuration).
+
+See [the documentation](/docs/multisite-optimization.md) for more details.
 
 ## Troubleshooting/Issues
 
