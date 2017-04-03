@@ -20,7 +20,7 @@ Assuming Fedora is installed with the path `fedora`, installation should just re
 
 ## JAAS implementation integration
 
-To make Fedora use our JAAS implementation, alter `AuthFilterJAAS` bean defined in `$FEDORA_HOME/server/config/security/web.xml` to use our class `ca.discoverygarden.fcrepo3.security.jaas.filter.AuthFilterJAAS` instead of `org.fcrepo.server.security.jaas.AuthFilterJAAS`.
+To make Fedora use our JAAS implementation, alter `AuthFilterJAAS` bean defined in `$FEDORA_HOME/server/config/spring/web/security.xml` to use our class `ca.discoverygarden.fcrepo3.security.jaas.filter.AuthFilterJAAS` instead of `org.fcrepo.server.security.jaas.AuthFilterJAAS`.
 
 ```xml
 [...]
