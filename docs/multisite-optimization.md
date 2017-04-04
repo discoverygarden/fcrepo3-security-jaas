@@ -68,7 +68,7 @@ fedora-auth
 
 ## Connection configuration
 
-Connections for consideration in the `DrupalMultisiteAuthModule` _must_ have unique `key` attributes in the `$FEDORA_HOME/server/config/filter-drupal.xml` (should a key not be unique, it is likely the last configured connection with the key would be used).
+Connections for consideration in the `DrupalMultisiteAuthModule` _must_ have unique `key` attributes in the `$FEDORA_HOME/server/config/filter-drupal.xml` (should a key _not_ be unique, only the last configured connection with the key will be used).
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
