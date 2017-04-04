@@ -27,7 +27,7 @@ Builds against 3.6.2 and generates a JAR in `fcrepo3-security-jaas/target`.
 
 ## Installation
 
-1. Drop the built JAR into your `$CATALINA_HOME/webapps/fedora/WEB-INF/lib`
+1. Drop both built JARs (from both `islandora_drupal_filter` and `fcrepo3-security-jaas`) into your `$CATALINA_HOME/webapps/fedora/WEB-INF/lib`
 
 ### `XMLUsersFileModule` thread-safety
 
