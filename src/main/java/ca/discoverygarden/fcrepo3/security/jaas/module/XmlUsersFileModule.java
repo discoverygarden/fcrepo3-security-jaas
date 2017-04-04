@@ -16,7 +16,7 @@
  * the License.
  */
 
-package ca.discoverygarden.fcrepo3.security.jaas;
+package ca.discoverygarden.fcrepo3.security.jaas.module;
 
 import java.io.File;
 import java.io.IOException;
