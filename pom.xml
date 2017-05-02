@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ca.discoverygarden</groupId>
     <artifactId>fcrepo3-security-jaas</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <name>DGI JAAS implementations</name>
     <properties>
         <skipTests>false</skipTests>
@@ -11,6 +11,7 @@
         <fedora.version>3.6.2</fedora.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+        <drupalauthfilter.version>7.1.10-SNAPSHOT</drupalauthfilter.version>
     </properties>
     <dependencies>
         <dependency>
@@ -34,7 +35,8 @@
         <dependency>
             <groupId>ca.islandora</groupId>
             <artifactId>fcrepo-drupalauthfilter</artifactId>
-            <version>${fedora.version}</version>
+            <version>${drupalauthfilter.version}</version>
+            <classifier>${fedora.version}</classifier>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -191,7 +193,16 @@
         </profile>
     </profiles>
     <build>
-        <finalName>${project.artifactId}-${project.version}_fcrepo${fedora.version}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <classifier>fcrepo${fedora.version}</classifier>
+                </configuration>
+            </plugin>
+        </plugins>
         <testResources>
             <testResource>
                 <filtering>true</filtering>
