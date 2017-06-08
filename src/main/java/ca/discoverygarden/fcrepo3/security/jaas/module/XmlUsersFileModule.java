@@ -82,6 +82,7 @@ implements LoginModule {
 
     protected boolean successLogin = false;
 
+    @Override
     public void initialize(Subject subject,
             CallbackHandler handler,
             Map<String, ?> sharedState,
@@ -102,6 +103,7 @@ implements LoginModule {
         }
     }
 
+    @Override
     public boolean login() throws LoginException {
         if (debug) {
             logger.debug(this.getClass().getName() + " login called.");
@@ -138,6 +140,7 @@ implements LoginModule {
         return successLogin;
     }
 
+    @Override
     public boolean commit() throws LoginException {
         if (!successLogin) {
             return false;
@@ -154,6 +157,7 @@ implements LoginModule {
         return true;
     }
 
+    @Override
     public boolean abort() throws LoginException {
         try {
             clear();
@@ -165,6 +169,7 @@ implements LoginModule {
         return true;
     }
 
+    @Override
     public boolean logout() throws LoginException {
         try {
             clear();
@@ -203,7 +208,7 @@ implements LoginModule {
             return false;
         }
 
-        principal = new UserPrincipal();
+        principal = new UserPrincipal(username);
         attributes = fullUser.attributes;
         return true;
     }
