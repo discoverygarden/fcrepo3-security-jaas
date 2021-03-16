@@ -94,7 +94,7 @@
                 <db.scheme>jdbc:mysql</db.scheme>
                 <db.group>mysql</db.group>
                 <db.artifact>mysql-connector-java</db.artifact>
-                <db.version>5.1.26</db.version>
+                <db.version>[8.0.16,9.0)</db.version>
             </properties>
             <build>
                 <plugins>
